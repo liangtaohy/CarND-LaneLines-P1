@@ -1,56 +1,169 @@
-# **Finding Lane Lines on the Road** 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+# **Finding Lane Lines on the Road By liangtaohy@gmail.com** 
 
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
-
-Overview
 ---
 
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
+**Finding Lane Lines on the Road**
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
-
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
-
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+The goals / steps of this project are the following:
+* Make a pipeline that finds lane lines on the road
+* Reflect on your work in a written report
 
 
-Creating a Great Writeup
+[//]: # (Image References)
+
+[image1]: ./examples/grayscale.jpg "Grayscale"
+[image2]: ./test_images_output/blur_image_00.jpg "Smoothing: Gaussian Blur"
+[image3]: ./test_images_output/blur_image_01.jpg "Smoothing: Gaussian Blur"
+[image4]: ./test_images_output/blur_image_02.jpg "Smoothing: Gaussian Blur"
+[image5]: ./test_images_output/blur_image_03.jpg "Smoothing: Gaussian Blur"
+[image6]: ./test_images_output/blur_image_04.jpg "Smoothing: Gaussian Blur"
+[image7]: ./test_images_output/blur_image_05.jpg "Smoothing: Gaussian Blur"
+[image8]: ./test_images_output/edge_image_00.jpg "Canny Edges"
+[image9]: ./test_images_output/edge_image_01.jpg "Canny Edges"
+[image10]: ./test_images_output/edge_image_02.jpg "Canny Edges"
+[image11]: ./test_images_output/edge_image_03.jpg "Canny Edges"
+[image12]: ./test_images_output/edge_image_04.jpg "Canny Edges"
+[image13]: ./test_images_output/edge_image_05.jpg "Canny Edges"
+[image14]: ./test_images_output/grayscale_image_00.jpg "RGB2Gray"
+[image15]: ./test_images_output/grayscale_image_01.jpg "RGB2Gray"
+[image16]: ./test_images_output/grayscale_image_02.jpg "RGB2Gray"
+[image17]: ./test_images_output/grayscale_image_03.jpg "RGB2Gray"
+[image18]: ./test_images_output/grayscale_image_04.jpg "RGB2Gray"
+[image19]: ./test_images_output/grayscale_image_05.jpg "RGB2Gray"
+[image20]: ./test_images_output/roi_image_00.jpg "ROI Region"
+[image21]: ./test_images_output/roi_image_01.jpg "ROI Region"
+[image22]: ./test_images_output/roi_image_02.jpg "ROI Region"
+[image23]: ./test_images_output/roi_image_03.jpg "ROI Region"
+[image24]: ./test_images_output/roi_image_04.jpg "ROI Region"
+[image25]: ./test_images_output/roi_image_05.jpg "ROI Region"
+[image26]: ./test_images_output/white_yellow_image_00.jpg "Color Select"
+[image27]: ./test_images_output/white_yellow_image_01.jpg "Color Select"
+[image28]: ./test_images_output/white_yellow_image_02.jpg "Color Select"
+[image29]: ./test_images_output/white_yellow_image_03.jpg "Color Select"
+[image30]: ./test_images_output/white_yellow_image_04.jpg "Color Select"
+[image31]: ./test_images_output/white_yellow_image_05.jpg "Color Select"
+[image32]: ./resources/white_yellow_image.png "Color Select"
+[image33]: ./resources/grayscale_image.png "Grayscale"
+[image34]: ./resources/blur_image.png "Smoothing: Gaussian Blur"
+[image35]: ./resources/edge_image.png "Canny Edges"
+[image36]: ./resources/roi_image.png "ROI Region"
+[image37]: ./resources/solid_line.png "Hough Line"
+[image38]: ./resources/extrapolate_line.png "Extrapolate Line"
+
+
 ---
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
 
-1. Describe the pipeline
+## Reflection
 
-2. Identify any shortcomings
+### 1. Pipeline
 
-3. Suggest possible improvements
+My pipeline consisted of 5 steps. Most of them were learned in the lesson.
 
-We encourage using images in your writeup to demonstrate how your pipeline works.  
+* [Color Select](#color-select)
+* [Grayscale](#grayscale)
+* [Smoothing With Gaussian Blur](#smoothing-with-gaussian-blur)
+* [Edge Detect](#edge-detect)
+* [ROI Select](#roi-select)
+* [Hough Transform](#hough-transform)
+* [Extrapolate line](#extrapolate-line)
+* [Final Videos](#final-videos)
 
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
+### 2. Color Select
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
+I use RGB filtering by applying white and yellow mask on the image. Here are the results:
+
+![alt text][image32]
 
 
-The Project
----
+### 3. Grayscale
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+After color select, I apply grayscaling on the images as shown here:
 
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/83ec35ee-1e02-48a5-bdb7-d244bd47c2dc/lessons/8c82408b-a217-4d09-b81d-1bda4c6380ef/concepts/4f1870e0-3849-43e4-b670-12e6f2d4b7a7) if you haven't already.
+![alt text][image33]
 
-**Step 2:** Open the code in a Jupyter Notebook
+### 4. Smoothing With Gaussian Blur
 
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out [Udacity's free course on Anaconda and Jupyter Notebooks](https://classroom.udacity.com/courses/ud1111) to get started.
+For good practice, grayscaling images should be smoothing for edge detect. I choose Gaussian Blur to smooth the images.
 
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
+![alt text][image34]
 
-`> jupyter notebook`
 
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
+### 5. Edge Detect
 
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
+For edge detect, Canny Alg is a good choice.
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+![alt text][image35]
+
+### 6. ROI Select
+
+After all above steps, I have gotten edge images. Now, I want to remove the unimportant part. The sky, the hill, the tree and others are unimportant. Interest Region is defined by four vertices.
+
+```
+width = image.shape[1]
+height = image.shape[0]
+v_top_left = [int(width*0.45), int(height*0.6)]
+v_top_right = [int(width*0.6), int(height*0.6)]
+v_bottom_left = [int(width*0.1), height-2]
+v_bottom_right = [int(width*0.95), height-2]
+```
+
+Here is the results after applying it on the Canny images:
+
+![alt text][image36]
+
+### 7. Hough Transform
+
+I use Hough Transform to detect lines in the images.
+
+![alt text][image37]
+
+### 8. Extrapolate line
+
+After Hough Transform, we get a collection of line segments. How to find left line and right line? I use tuple `<slope, intercept>` to indicate a line. If slope is negative, it should be a left line. If slope is positive, it should be a right line.
+Through the way, we can get left lines collection and right lines colletion. The weighted average based on intercept length is applied to the two collections to find a left line and a right line.
+
+```
+def average_slope_intercept(lines):
+    left_lane_lines    = [] # (slope, intercept)
+    left_lane_weights  = [] # (length,)
+    right_lane_lines   = [] # (slope, intercept)
+    right_lane_weights = [] # (length,)
+    
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            if x2==x1:
+                continue # ignore a vertical line
+            slope = (y2-y1)/(x2-x1)
+            intercept = y1 - slope*x1
+            length = np.sqrt((y2-y1)**2+(x2-x1)**2)
+            if slope < 0: # y is reversed in image
+                left_lane_lines.append((slope, intercept))
+                left_lane_weights.append((length))
+            else:
+                right_lane_lines.append((slope, intercept))
+                right_lane_weights.append((length))
+
+    # Weight slopes and Y_intercepts by their line lenght
+    right_lane = np.dot(right_lane_weights, right_lane_lines) / np.sum(right_lane_weights) if len(right_lane_weights) > 0 else None
+    left_lane  = np.dot(left_lane_weights,  left_lane_lines) / np.sum(left_lane_weights)  if len(left_lane_weights) > 0 else None
+
+    return right_lane, left_lane
+```
+
+See result example:
+![alt text][image38]
+
+### 9. Final Videos
+
+You can find videos from the link:
+* [solidYellowLeft.mp4](https://github.com/liangtaohy/CarND-LaneLines-P1/tree/master/test_videos_output)
+* [solidWhiteRight.mp4](https://github.com/liangtaohy/CarND-LaneLines-P1/tree/master/test_videos_output)
+* [challenge.mp4](https://github.com/liangtaohy/CarND-LaneLines-P1/tree/master/test_videos_output)
+
+## Potential shortcomings with the pipeline
+
+* Identifying curves.
+* The line quality is tested when the car is driving at higher speeds.
+* I think there should be a more robust and dynamic method of identifying the road's horizon rather than just including 60% of the image height.
+* Polynomial fit for lane line fit
 
