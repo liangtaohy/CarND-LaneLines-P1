@@ -48,6 +48,7 @@ The goals / steps of this project are the following:
 [image35]: ./resources/edge_image.png "Canny Edges"
 [image36]: ./resources/roi_image.png "ROI Region"
 [image37]: ./resources/solid_line.png "Hough Line"
+[image38]: ./resources/extrapolate_line.png "Extrapolate Line"
 
 
 ---
@@ -56,15 +57,16 @@ The goals / steps of this project are the following:
 
 ### 1. Pipeline
 
-My pipeline consisted of 5 steps.
+My pipeline consisted of 5 steps. Most of them were learned in the lesson.
 
-* Color Select
-* Grayscale
-* Smoothing: Gaussian Blur
-* Edge Detect: Canny Detect
-* ROI Region Select
-* Hough Transform
-* Extrapolate lines
+* [Color Select](#color-select)
+* [Grayscale](#grayscale)
+* [Smoothing With Gaussian Blur](#smoothing-with-gaussian-blur)
+* [Edge Detect](#edge-detect)
+* [ROI Select](#roi-select)
+* [Hough Transform](#hough-transform)
+* [Extrapolate line](#extrapolate-line)
+* [Final Videos](#final-videos)
 
 ### 2. Color Select
 
@@ -79,22 +81,26 @@ After color select, I apply grayscaling on the images as shown here:
 
 ![alt text][image33]
 
-### 4. Smoothing the images
+### 4. Smoothing With Gaussian Blur
 
 For good practice, grayscaling images should be smoothing for edge detect. I choose Gaussian Blur to smooth the images.
 
 ![alt text][image34]
 
 
-### 5. Canny Edges Detect
+### 5. Edge Detect
+
+For edge detect, Canny Alg is a good choice.
 
 ![alt text][image35]
 
 ### 6. ROI Select
 
-After all above steps, I have gotten edge images. Now, I want to remove the unimportant part. Interest Region is defined by for vertices.
+After all above steps, I have gotten edge images. Now, I want to remove the unimportant part. The sky, the hill, the tree and others are unimportant. Interest Region is defined by four vertices.
 
 ```
+width = image.shape[1]
+height = image.shape[0]
 v_top_left = [int(width*0.45), int(height*0.6)]
 v_top_right = [int(width*0.6), int(height*0.6)]
 v_bottom_left = [int(width*0.1), height-2]
@@ -110,4 +116,54 @@ Here is the results after applying it on the Canny images:
 I use Hough Transform to detect lines in the images.
 
 ![alt text][image37]
+
+### 8. Extrapolate line
+
+After Hough Transform, we get a collection of line segments. How to find left line and right line? I use tuple `<slope, intercept>` to indicate a line. If slope is negative, it should be a left line. If slope is positive, it should be a right line.
+Through the way, we can get left lines collection and right lines colletion. The weighted average based on intercept length is applied to the two collections to find a left line and a right line.
+
+```
+def average_slope_intercept(lines):
+    left_lane_lines    = [] # (slope, intercept)
+    left_lane_weights  = [] # (length,)
+    right_lane_lines   = [] # (slope, intercept)
+    right_lane_weights = [] # (length,)
+    
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            if x2==x1:
+                continue # ignore a vertical line
+            slope = (y2-y1)/(x2-x1)
+            intercept = y1 - slope*x1
+            length = np.sqrt((y2-y1)**2+(x2-x1)**2)
+            if slope < 0: # y is reversed in image
+                left_lane_lines.append((slope, intercept))
+                left_lane_weights.append((length))
+            else:
+                right_lane_lines.append((slope, intercept))
+                right_lane_weights.append((length))
+
+    # Weight slopes and Y_intercepts by their line lenght
+    right_lane = np.dot(right_lane_weights, right_lane_lines) / np.sum(right_lane_weights) if len(right_lane_weights) > 0 else None
+    left_lane  = np.dot(left_lane_weights,  left_lane_lines) / np.sum(left_lane_weights)  if len(left_lane_weights) > 0 else None
+
+    return right_lane, left_lane
+```
+
+See result example:
+![alt text][image38]
+
+### 9. Final Videos
+
+You can find videos from the link:
+* [solidYellowLeft.mp4](https://github.com/liangtaohy/CarND-LaneLines-P1/tree/master/test_videos_output)
+* [solidWhiteRight.mp4](https://github.com/liangtaohy/CarND-LaneLines-P1/tree/master/test_videos_output)
+* [challenge.mp4](https://github.com/liangtaohy/CarND-LaneLines-P1/tree/master/test_videos_output)
+
+## Potential shortcomings with the pipeline
+
+* Identifying curves.
+* The line quality is tested when the car is driving at higher speeds.
+* I think there should be a more robust and dynamic method of identifying the road's horizon rather than just including 60% of the image height.
+* Polynomial fit for lane line fit
 
