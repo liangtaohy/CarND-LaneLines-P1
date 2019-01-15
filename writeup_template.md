@@ -42,6 +42,13 @@ The goals / steps of this project are the following:
 [image29]: ./test_images_output/white_yellow_image_03.jpg "Color Select"
 [image30]: ./test_images_output/white_yellow_image_04.jpg "Color Select"
 [image31]: ./test_images_output/white_yellow_image_05.jpg "Color Select"
+[image32]: ./resources/white_yellow_image.png "Color Select"
+[image33]: ./resources/grayscale_image.png "Grayscale"
+[image34]: ./resources/blur_image.png "Smoothing: Gaussian Blur"
+[image35]: ./resources/edge_image.png "Canny Edges"
+[image36]: ./resources/roi_image.png "ROI Region"
+[image37]: ./resources/solid_line.png "Hough Line"
+
 
 ---
 
@@ -56,60 +63,51 @@ My pipeline consisted of 5 steps.
 * Smoothing: Gaussian Blur
 * Edge Detect: Canny Detect
 * ROI Region Select
-* Hough Line Detect
+* Hough Transform
 * Extrapolate lines
 
 ### 2. Color Select
 
 I use RGB filtering by applying white and yellow mask on the image. Here are the results:
 
-![alt text][image26]
-![alt text][image27]
-![alt text][image28]
-![alt text][image29]
-![alt text][image30]
-![alt text][image31]
+![alt text][image32]
 
 
 ### 3. Grayscale
 
 After color select, I apply grayscaling on the images as shown here:
 
-![alt text][image14]
-![alt text][image15]
-![alt text][image16]
-![alt text][image17]
-![alt text][image18]
-![alt text][image19]
+![alt text][image33]
 
 ### 4. Smoothing the images
 
 For good practice, grayscaling images should be smoothing for edge detect. I choose Gaussian Blur to smooth the images.
 
-![alt text][image2]
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-![alt text][image6]
-![alt text][image7]
+![alt text][image34]
 
 
 ### 5. Canny Edges Detect
 
-![alt text][image8]
-![alt text][image9]
-![alt text][image10]
-![alt text][image11]
-![alt text][image12]
-![alt text][image13]
+![alt text][image35]
 
 ### 6. ROI Select
 
-After all above steps, I have gotten edge images. Now, I want to remove the unimportant part. Here is the results after applying it on the Canny images:
+After all above steps, I have gotten edge images. Now, I want to remove the unimportant part. Interest Region is defined by for vertices.
 
-![alt text][image20]
-![alt text][image21]
-![alt text][image22]
-![alt text][image23]
-![alt text][image24]
-![alt text][image25]
+```
+v_top_left = [int(width*0.45), int(height*0.6)]
+v_top_right = [int(width*0.6), int(height*0.6)]
+v_bottom_left = [int(width*0.1), height-2]
+v_bottom_right = [int(width*0.95), height-2]
+```
+
+Here is the results after applying it on the Canny images:
+
+![alt text][image36]
+
+### 7. Hough Transform
+
+I use Hough Transform to detect lines in the images.
+
+![alt text][image37]
+
